@@ -1,4 +1,4 @@
-package org.celllife;
+package com.nomsic.sid;
 
 import java.util.SortedSet;
 

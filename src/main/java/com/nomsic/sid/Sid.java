@@ -1,4 +1,4 @@
-package org.celllife;
+package com.nomsic.sid;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -179,7 +178,7 @@ public class Sid {
 		if (recordSets == null) {
 			Preconditions.checkNotNull(recordFile);
 			recordSets = Files.readLines(recordFile, Charset.defaultCharset(),
-					new RecordFileProcessor());
+					new FieldRecordProcessor());
 		}
 
 		@SuppressWarnings("unchecked")
@@ -228,8 +227,8 @@ public class Sid {
 	
 	public void loadFromFile(File recordFile) throws IOException {
 		try {
-			String firstLine = Files.readFirstLine(recordFile, Charset.defaultCharset());
 			log.info("Reading from file '{}'", recordFile.getAbsolutePath());
+			String firstLine = Files.readFirstLine(recordFile, Charset.defaultCharset());
 			log.debug("File first line: {}", firstLine);
 			this.recordFile = recordFile;
 		} catch (IOException e) {
@@ -238,12 +237,12 @@ public class Sid {
 		}
 	}
 	
-	public void loadFromMap(Map<String, String> fieldRecordMap){
-		RecordFileProcessor processor = new RecordFileProcessor();
+	public void loadFromRecordMap(Map<String, String> fieldRecordMap){
+		FieldRecordProcessor processor = new FieldRecordProcessor();
 		for (Entry<String, String> entry : fieldRecordMap.entrySet()) {
 			processor.addFieldRecord(entry.getKey(), entry.getValue());
 		}
 		recordSets = processor.getResult();
 	}
-
+	
 }

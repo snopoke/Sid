@@ -1,4 +1,4 @@
-package org.celllife;
+package com.nomsic.sid;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -24,14 +24,14 @@ import com.google.common.io.LineProcessor;
  * @author Simon Kelly <simongdkelly@gmail.com>
  * 
  */
-final class RecordFileProcessor implements
+final class FieldRecordProcessor implements
 		LineProcessor<Collection<SortedSet<String>>> {
 
 	private static final Logger log = LoggerFactory
-			.getLogger(RecordFileProcessor.class);
+			.getLogger(FieldRecordProcessor.class);
 	private SortedMap<String, SortedSet<String>> map;
 
-	public RecordFileProcessor() {
+	public FieldRecordProcessor() {
 		map = Maps.newTreeMap();
 	}
 
