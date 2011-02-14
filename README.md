@@ -9,6 +9,7 @@ The Sorensen index is calculated as follows:
 
 	QS = 2C /(A + B) 
 where
+
  * C is the number of field values that recordA and recordB have in common
  * A is the total number of fields for recordA
  * B is the total number of fields for recrodB
