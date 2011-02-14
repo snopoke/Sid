@@ -30,6 +30,8 @@ final class FieldRecordProcessor implements
 	private static final Logger log = LoggerFactory
 			.getLogger(FieldRecordProcessor.class);
 	private SortedMap<String, SortedSet<String>> map;
+	private boolean ignoreFirstLine;
+	private boolean firstCall = true;
 
 	public FieldRecordProcessor() {
 		map = Maps.newTreeMap();
@@ -42,6 +44,10 @@ final class FieldRecordProcessor implements
 
 	@Override
 	public boolean processLine(String line) throws IOException {
+		if (ignoreFirstLine && firstCall){
+			firstCall = false;
+			return true;
+		}
 		int i = line.lastIndexOf(',');
 		if (i < 0) {
 			log.warn("invalid line:" + line);
@@ -65,5 +71,9 @@ final class FieldRecordProcessor implements
 			recordSet.add(recordId);
 			map.put(field, recordSet);
 		}
+	}
+
+	public void setIgnoreFirstLine(boolean ignoreFirstLine) {
+		this.ignoreFirstLine = ignoreFirstLine;
 	}
 }

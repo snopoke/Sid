@@ -13,7 +13,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -36,21 +35,12 @@ public class Sid {
 
 	private static final Logger log = LoggerFactory.getLogger(Sid.class);
 
-	public static void main(String[] args) throws IOException {
-		Sid sid = new Sid();
-		sid.loadFromFile("lime_h2.csv");
-		List<Match> matches = sid.getMatches(0.9d);
-		for (Match match : matches) {
-			System.out.println(match);
-		}
-	}
-
 	/**
 	 * This map contains entries whose key is a recordId and value is a sorted
 	 * set of Simsets that the record belongs to i.e. the record is present in
 	 * each Simset
 	 */
-	private SortedMap<String, SortedSet<Simset>> recordSimsetMap;
+	private SortedMap<String, Set<Simset>> recordSimsetMap;
 
 	/**
 	 * This map contains entries whose key is a recordId and value is the number
@@ -61,6 +51,8 @@ public class Sid {
 	private File recordFile;
 
 	private Collection<SortedSet<String>> recordSets;
+
+	public boolean ignoreFirstLine;
 
 	public Sid() {
 		recordSimsetMap = Maps.newTreeMap();
@@ -88,9 +80,12 @@ public class Sid {
 			Simset simset = new Simset(entry.getValue(), entry.getKey());
 			for (String recordId : simset.getRecordSet()) {
 				if (recordSimsetMap.containsKey(recordId)) {
-					recordSimsetMap.get(recordId).add(simset);
+					boolean add = recordSimsetMap.get(recordId).add(simset);
+					if (!add){
+						log.error("Simset '{}' not added for record '{}'", simset, recordId);
+					}
 				} else {
-					TreeSet<Simset> treeSet = Sets.newTreeSet();
+					Set<Simset> treeSet = Sets.newHashSet();
 					treeSet.add(simset);
 					recordSimsetMap.put(recordId, treeSet);
 				}
@@ -124,7 +119,7 @@ public class Sid {
 		int matchCount = 1;
 
 		Set<Match> matches = Sets.newHashSet();
-		for (Entry<String, SortedSet<Simset>> entry : recordSimsetMap.entrySet()) {
+		for (Entry<String, Set<Simset>> entry : recordSimsetMap.entrySet()) {
 			recordCount++;
 			String recordA = entry.getKey();
 			for (Simset simset :  entry.getValue()) {
@@ -158,7 +153,7 @@ public class Sid {
 	 */
 	private int countCommonFields(String recordAId, String recordBId) {
 		int count = 0;
-		SortedSet<Simset> recordASimsets = recordSimsetMap.get(recordAId);
+		Set<Simset> recordASimsets = recordSimsetMap.get(recordAId);
 		for (Simset simset : recordASimsets) {
 			if (simset.getRecordSet().contains(recordBId)) {
 				count += simset.getFieldCount();
@@ -177,8 +172,10 @@ public class Sid {
 		
 		if (recordSets == null) {
 			Preconditions.checkNotNull(recordFile);
+			FieldRecordProcessor processor = new FieldRecordProcessor();
+			processor.setIgnoreFirstLine(ignoreFirstLine);
 			recordSets = Files.readLines(recordFile, Charset.defaultCharset(),
-					new FieldRecordProcessor());
+					processor);
 		}
 
 		@SuppressWarnings("unchecked")
@@ -239,10 +236,15 @@ public class Sid {
 	
 	public void loadFromRecordMap(Map<String, String> fieldRecordMap){
 		FieldRecordProcessor processor = new FieldRecordProcessor();
+		processor.setIgnoreFirstLine(ignoreFirstLine);
 		for (Entry<String, String> entry : fieldRecordMap.entrySet()) {
 			processor.addFieldRecord(entry.getKey(), entry.getValue());
 		}
 		recordSets = processor.getResult();
+	}
+	
+	public void setIgnoreFirstLine(boolean ignoreFirstLine){
+		this.ignoreFirstLine = ignoreFirstLine;
 	}
 	
 }

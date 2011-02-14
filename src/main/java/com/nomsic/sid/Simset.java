@@ -13,7 +13,7 @@ import com.google.common.collect.Sets;
  * @author Simon Kelly <simon@cell-life.org>
  * 
  */
-public class Simset implements Comparable<Simset> {
+public class Simset {
 
 	private int fieldCount = 1;
 
@@ -29,12 +29,6 @@ public class Simset implements Comparable<Simset> {
 	public Simset(String response_id) {
 		this.recordSet = Sets.newTreeSet();
 		this.recordSet.add(response_id);
-	}
-
-	@Override
-	public int compareTo(Simset o) {
-		boolean equal = this.getRecordSet().equals(o.getRecordSet());
-		return equal ? 0 : this.getRecordSet().size() - o.getRecordSet().size();
 	}
 
 	public void setFieldCount(int count) {
