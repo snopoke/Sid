@@ -1,7 +1,8 @@
+**THIS PROJECT IS UNMAINTAINED**
+
+
 Sid - a field based record matcher
 ==================================
-
-**THIS PROJECT IS UNMAINTAINED**
 
 Sid compares the field values of records and determines their similarity 
 by calculating the [Sorensen similarity index](http://en.wikipedia.org/wiki/S%C3%B8rensen_similarity_index) 
